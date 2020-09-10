@@ -4,9 +4,7 @@ if !exists("g:cmdline_job")
 endif
 
 function! OCamlSourceLines(lines)
-    for line in a:lines
-        call VimCmdLineSendCmd(substitute(line, ";;$", "", "g"))
-    endfor
+    call VimCmdLineSendCmd(substitute(join(a:lines, b:cmdline_nl), ";;$", "", "g"))
     call VimCmdLineSendCmd(";;\<CR>")
 endfunction
 
