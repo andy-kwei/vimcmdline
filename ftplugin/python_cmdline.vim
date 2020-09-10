@@ -56,7 +56,6 @@ function! PythonSendLine()
     if strlen(line) > 0 || b:cmdline_send_empty
         call VimCmdLineSendCmd(line)
     endif
-    call VimCmdLineDown()
 endfunction
 
 if has("win32")

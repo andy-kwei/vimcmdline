@@ -194,8 +194,8 @@ function VimCmdLineStart_Nvim(app)
 endfunction
 
 function VimCmdLineCreateMaps()
-    exe 'nmap <silent><buffer> ' . g:cmdline_map_send . ' :call VimCmdLineSendLine()<CR>'
-    exe 'nmap <silent><buffer> ' . g:cmdline_map_send_and_stay . ' :call VimCmdLineSendLineAndStay()<CR>'
+    exe 'nmap <silent><buffer> ' . g:cmdline_map_send . ' :call VimCmdLineSendLine(0)<CR>'
+    exe 'nmap <silent><buffer> ' . g:cmdline_map_send_and_stay . ' :call VimCmdLineSendLine(1)<CR>'
     exe 'vmap <silent><buffer> ' . g:cmdline_map_send .
                 \ ' <Esc>:call VimCmdLineSendSelection()<CR>'
     if exists("b:cmdline_source_fun")
@@ -282,34 +282,26 @@ function VimCmdLineSendCmd(...)
 endfunction
 
 " Send current line to the interpreter and go down to the next non empty line
-function VimCmdLineSendLine()
+function VimCmdLineSendLine(stay)
     if exists('*b:cmdline_send')
         call b:cmdline_send()
-        return
+    else
+      let line = getline(".")
+      if strlen(line) > 0 || b:cmdline_send_empty
+          if exists("b:cmdline_source_fun")
+              call b:cmdline_source_fun([line])
+          else
+              call VimCmdLineSendCmd(line)
+          endif
+      endif
     endif
-    let line = getline(".")
-    if strlen(line) > 0 || b:cmdline_send_empty
-        call VimCmdLineSendCmd(line)
-    endif
-    call VimCmdLineDown()
-endfunction
-
-" Send current line to the interpreter and but keep cursor on current line
-function VimCmdLineSendLineAndStay()
-    let line = getline(".")
-    if strlen(line) > 0 || b:cmdline_send_empty
-        call VimCmdLineSendCmd(line)
+    if !a:stay
+      call VimCmdLineDown()
     endif
 endfunction
 
 function VimCmdLineSendSelection()
-    if line("'<") == line("'>")
-        let i = col("'<") - 1
-        let j = col("'>") - i
-        let l = getline("'<")
-        let line = strpart(l, i, j)
-        call VimCmdLineSendCmd(line)
-    elseif exists("b:cmdline_source_fun")
+    if exists("b:cmdline_source_fun")
         call b:cmdline_source_fun(getline("'<", "'>"))
     endif
 endfunction

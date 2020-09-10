@@ -10,16 +10,9 @@ function! OCamlSourceLines(lines)
     call VimCmdLineSendCmd(";;\<CR>")
 endfunction
 
-function! OCamlSendLine()
-    let line = getline(".")
-    call VimCmdLineSendCmd(line . ";;\<CR>")
-    call VimCmdLineDown()
-endfunction
-
 let b:cmdline_nl = "\<CR>"
 let b:cmdline_app = "utop"
 let b:cmdline_quit_cmd = "#quit;;"
-let b:cmdline_send = function("OCamlSendLine")
 let b:cmdline_source_fun = function("OCamlSourceLines")
 let b:cmdline_send_empty = 1
 let b:cmdline_filetype = "ocaml"
